@@ -1,0 +1,63 @@
+[project]
+name = "synthaia"
+version = "0.1.0"
+description = "AI-powered music creation toolkit"
+authors = [{name = "Synthaia Contributors"}]
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+
+dependencies = [
+    "mido>=1.3.0",
+    "typer>=0.9.0",
+    "python-dotenv>=1.0.0",
+    "langchain>=0.1.0",
+    "langchain-community>=0.0.20",
+    "langchain-google-genai>=1.0.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "python-multipart>=0.0.6",
+    "websockets>=12.0",
+    "requests>=2.31.0",
+    "pysinsy>=0.3.0",
+    "setuptools>=68.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]
+
+midi = [
+    "music21>=9.1.0",
+]
+
+realtime_midi = [
+    "python-rtmidi>=1.5.0",
+]
+
+audio = [
+    "librosa>=0.10.0",
+    "soundfile>=0.12.0",
+    "torch>=2.0.0",
+    "torchaudio>=2.0.0",
+    "pyfluidsynth>=1.3.0",  # Python wrapper for FluidSynth MIDI synthesizer
+]
+
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["scripts", "api"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+

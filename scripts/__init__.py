@@ -1,0 +1,2 @@
+"""Synthaia scripts package."""
+
