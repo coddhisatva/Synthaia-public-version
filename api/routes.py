@@ -30,7 +30,6 @@ from scripts.midi.generate_melody import generate_melody_core
 from scripts.midi.continue_melody import continue_melody_core
 from scripts.midi.harmonize_melody import harmonize_melody_core
 from scripts.midi.generate_drums import generate_drums_core
-from scripts.midi.generate_vocal_melody import generate_vocal_melody_core
 from scripts.utils.midi_utils import create_midi_from_json, extract_melody_data
 from scripts.audio.render_midi import render_complete_song_wav, render_instrumental_wav
 
@@ -154,14 +153,38 @@ async def websocket_generate_song(websocket: WebSocket):
         
         # Step 6/9: Generate vocals
         await send_progress(websocket, 6, 9, "Generating vocal melody...")
-        vocals_data = generate_vocal_melody_core(melody_path, continuation_path, harmony_path, lyrics)
         vocals_path = midi_dir / f"{base_name}_vocals.mid"
         
-        # Get word mapping from vocals_data (already computed by core function)
-        word_mapping = vocals_data.get("word_mapping", [])
+        # Use subprocess with heartbeats (vocal generation is slow)
+        process = subprocess.Popen([
+            "python", "scripts/midi/generate_vocal_melody.py",
+            str(melody_path),
+            str(continuation_path),
+            str(harmony_path),
+            "--lyrics", str(lyrics_path),
+            "-o", str(vocals_path)
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
         
-        # Create MIDI with embedded lyrics
-        create_midi_from_json(vocals_data, vocals_path, word_mapping=word_mapping)
+        # Send heartbeats while subprocess runs to keep connection alive
+        while process.poll() is None:
+            await asyncio.sleep(1)
+            try:
+                await websocket.send_json({"type": "heartbeat"})
+                await asyncio.sleep(0)  # Flush
+            except Exception:
+                # Connection closed, stop heartbeats
+                break
+        
+        # Get final result
+        stdout, stderr = process.communicate()
+        
+        if process.returncode != 0:
+            await websocket.send_json({
+                "error": f"Vocal generation failed: {stderr}",
+                "status": "error"
+            })
+            await websocket.close()
+            return
         
         # Check if vocal WAV was generated (filename includes _melody prefix)
         vocal_wav_path = output_dir / "audio" / f"{base_name}_melody_vocals.wav"
