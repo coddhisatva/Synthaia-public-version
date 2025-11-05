@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Midi } from '@tonejs/midi';
 import * as Tone from 'tone';
 import Soundfont from 'soundfont-player';
+import config from '../config';
 
 export default function MidiPlayer({ midiUrl, vocalWavUrl }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -95,7 +96,7 @@ export default function MidiPlayer({ midiUrl, vocalWavUrl }) {
     console.log('🔍 MidiPlayer vocalWavUrl prop:', vocalWavUrl);
     if (vocalWavUrl) {
       console.log('✅ Loading vocal WAV audio');
-      const audio = new Audio(`http://localhost:8000${vocalWavUrl}`);
+      const audio = new Audio(`${config.apiUrl}${vocalWavUrl}`);
       audio.volume = channelGains['wav'] / 100;
       vocalAudioRef.current = audio;
     } else {
@@ -115,7 +116,7 @@ export default function MidiPlayer({ midiUrl, vocalWavUrl }) {
       setError(null);
 
       // Fetch MIDI file
-      const response = await fetch(`http://localhost:8000${midiUrl}`);
+      const response = await fetch(`${config.apiUrl}${midiUrl}`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }

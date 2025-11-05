@@ -10,6 +10,7 @@ import ProgressIndicator from './ProgressIndicator';
 import ErrorAlert from './ErrorAlert';
 import LoadingSpinner from './LoadingSpinner';
 import MidiPlayer from './MidiPlayer';
+import config from '../config';
 
 export default function ConnectionTest() {
   const [healthStatus, setHealthStatus] = useState(null);
@@ -269,7 +270,7 @@ export default function ConnectionTest() {
               <div className="space-y-2 text-sm">
                 <p><strong>Complete MIDI:</strong> 
                   <a 
-                    href={`http://localhost:8000${result.midi_url}`}
+                    href={`${config.apiUrl}${result.midi_url}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline ml-2"
@@ -279,7 +280,7 @@ export default function ConnectionTest() {
                 </p>
                 <p><strong>Vocals MIDI:</strong> 
                   <a 
-                    href={`http://localhost:8000${result.midi_url.replace('_complete', '_vocals')}`}
+                    href={`${config.apiUrl}${result.midi_url.replace('_complete', '_vocals')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline ml-2"
@@ -291,7 +292,7 @@ export default function ConnectionTest() {
                 {result.complete_wav_url && (
                   <p><strong>Complete Audio (WAV):</strong> 
                     <a 
-                      href={`http://localhost:8000${result.complete_wav_url}`}
+                      href={`${config.apiUrl}${result.complete_wav_url}`}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
@@ -305,7 +306,7 @@ export default function ConnectionTest() {
                 {result.instrumental_wav_url && (
                   <p><strong>Instrumental Audio (sans Vocal track) (WAV):</strong> 
                     <a 
-                      href={`http://localhost:8000${result.instrumental_wav_url}`}
+                      href={`${config.apiUrl}${result.instrumental_wav_url}`}
                       download
                       target="_blank"
                       rel="noopener noreferrer"
@@ -452,7 +453,7 @@ export default function ConnectionTest() {
                       </summary>
                       <div className="px-3 py-2 border-t border-gray-200 space-y-2">
                         <a 
-                          href={`http://localhost:8000${song.midi_url}`}
+                          href={`${config.apiUrl}${song.midi_url}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="block text-sm text-blue-600 hover:underline"
@@ -461,7 +462,7 @@ export default function ConnectionTest() {
                         </a>
                         {song.complete_wav_url && (
                           <a 
-                            href={`http://localhost:8000${song.complete_wav_url}`}
+                            href={`${config.apiUrl}${song.complete_wav_url}`}
                             download
                             className="block text-sm text-blue-600 hover:underline"
                           >
@@ -470,7 +471,7 @@ export default function ConnectionTest() {
                         )}
                         {song.instrumental_wav_url && (
                           <a 
-                            href={`http://localhost:8000${song.instrumental_wav_url}`}
+                            href={`${config.apiUrl}${song.instrumental_wav_url}`}
                             download
                             className="block text-sm text-blue-600 hover:underline"
                           >
