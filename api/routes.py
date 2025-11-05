@@ -29,8 +29,7 @@ from scripts.lyrics.idea_to_lyrics import generate_ideas_core, generate_lyrics_c
 from scripts.midi.generate_melody import generate_melody_core
 from scripts.midi.continue_melody import continue_melody_core
 from scripts.midi.harmonize_melody import harmonize_melody_core
-from scripts.midi.generate_drums import generate_drums_core
-from scripts.utils.midi_utils import create_midi_from_json, extract_melody_data
+from scripts.utils.midi_utils import create_midi_from_json
 from scripts.audio.render_midi import render_complete_song_wav, render_instrumental_wav
 
 # Create router for song generation endpoints
@@ -145,11 +144,37 @@ async def websocket_generate_song(websocket: WebSocket):
         
         # Step 5/9: Generate drums
         await send_progress(websocket, 5, 9, "Creating drum pattern...")
-        melody_info = extract_melody_data(melody_path)
-        tempo = melody_info['tempo']
-        drums_data = generate_drums_core(tempo, "steady beat with emotional fills", measures=8)
         drums_path = midi_dir / f"{base_name}_drums.mid"
-        create_midi_from_json(drums_data, drums_path)
+        
+        # Use subprocess with heartbeats (drum generation can be slow)
+        process = subprocess.Popen([
+            "python", "scripts/midi/generate_drums.py",
+            str(melody_path),
+            "steady beat with emotional fills",
+            "--measures", "8",
+            "-o", str(drums_path)
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+        
+        # Send heartbeats while subprocess runs to keep connection alive
+        while process.poll() is None:
+            await asyncio.sleep(1)
+            try:
+                await websocket.send_json({"type": "heartbeat"})
+                await asyncio.sleep(0)  # Flush
+            except Exception:
+                # Connection closed, stop heartbeats
+                break
+        
+        # Get final result
+        stdout, stderr = process.communicate()
+        
+        if process.returncode != 0:
+            await websocket.send_json({
+                "error": f"Drum generation failed: {stderr}",
+                "status": "error"
+            })
+            await websocket.close()
+            return
         
         # Step 6/9: Generate vocals
         await send_progress(websocket, 6, 9, "Generating vocal melody...")
