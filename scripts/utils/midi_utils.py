@@ -130,8 +130,32 @@ def create_midi_from_json(melody_data: dict, output_path: Path, velocity: int = 
             start_tick = int((start_time_seconds * tempo / 60.0) * ticks_per_beat)
             
             # Add lyric event at the start of the note
-            # MIDI uses latin-1, so replace smart quotes with regular quotes
-            clean_word = word.replace('\u2019', "'").replace('\u2018', "'").replace('\u201c', '"').replace('\u201d', '"')
+            # MIDI uses latin-1, so replace Unicode punctuation with ASCII equivalents
+            clean_word = (word
+                .replace('\u2019', "'")   # Right single quote (')
+                .replace('\u2018', "'")   # Left single quote (')
+                .replace('\u201c', '"')   # Left double quote (")
+                .replace('\u201d', '"')   # Right double quote (")
+                .replace('\u201e', '"')   # Double low-9 quote („)
+                .replace('\u201f', '"')   # Double high-reversed-9 quote (‟)
+                .replace('\u2014', '-')   # Em dash (—)
+                .replace('\u2013', '-')   # En dash (–)
+                .replace('\u2012', '-')   # Figure dash (‒)
+                .replace('\u2015', '-')   # Horizontal bar (―)
+                .replace('\u2026', '...') # Ellipsis (…)
+                .replace('\u2022', '*')   # Bullet (•)
+                .replace('\u00a0', ' ')   # Non-breaking space
+                .replace('\u2002', ' ')   # En space
+                .replace('\u2003', ' ')   # Em space
+                .replace('\u2009', ' ')   # Thin space
+                .replace('\u00ab', '"')   # Left guillemet («)
+                .replace('\u00bb', '"')   # Right guillemet (»)
+                .replace('\u2032', "'")   # Prime (′)
+                .replace('\u2033', '"')   # Double prime (″)
+                .replace('\u02bc', "'")   # Modifier letter apostrophe (ʼ)
+            )
+            # Remove any remaining non-latin-1 characters
+            clean_word = clean_word.encode('latin-1', errors='ignore').decode('latin-1')
             events.append((start_tick, MetaMessage('lyrics', text=clean_word)))
         
         # Sort all events by absolute time
