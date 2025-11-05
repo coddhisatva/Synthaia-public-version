@@ -15,6 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+import os
 from api.models import HealthResponse
 from api import routes
 
@@ -26,14 +27,21 @@ app = FastAPI(
 )
 
 # Configure CORS - allow frontend to call backend
-# Frontend runs on localhost:3000, backend runs on localhost:8000
+# Get allowed origins from environment variable or use defaults
+allowed_origins = [
+    "http://localhost:3000",  # React dev server
+    "http://127.0.0.1:3000",  # Alternative localhost
+    "http://localhost:5173",  # Vite default port
+]
+
+# Add production frontend URL if set
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # React dev server
-        "http://127.0.0.1:3000",  # Alternative localhost
-        "http://localhost:5173",  # Vite default port (backup)
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
     allow_headers=["*"],  # Allow all headers
