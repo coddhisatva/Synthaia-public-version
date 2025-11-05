@@ -51,8 +51,8 @@ models/*.pt
 models/*.pth
 models/*.onnx
 
-# Soundfonts (too large for git)
+# Soundfonts (keep .sf3, ignore larger .sf2 and archives)
 soundfonts/*.sf2
-soundfonts/*.sf3
 soundfonts/*.zip
+# Note: MuseScore_General.sf3 (38MB) is committed for production use
 
