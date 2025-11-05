@@ -20,6 +20,10 @@ dependencies = [
     "websockets>=12.0",
     "requests>=2.31.0",
     "setuptools>=68.0.0",
+    "music21>=9.1.0",
+    "pyfluidsynth>=1.3.0",
+    "librosa>=0.10.0",
+    "soundfile>=0.12.0",
 ]
 
 [project.optional-dependencies]
@@ -29,20 +33,8 @@ dev = [
     "ruff>=0.1.0",
 ]
 
-midi = [
-    "music21>=9.1.0",
-]
-
 realtime_midi = [
-    "python-rtmidi>=1.5.0",
-]
-
-audio = [
-    "librosa>=0.10.0",
-    "soundfile>=0.12.0",
-    "torch>=2.0.0",
-    "torchaudio>=2.0.0",
-    "pyfluidsynth>=1.3.0",  # Python wrapper for FluidSynth MIDI synthesizer
+    "python-rtmidi>=1.5.0",  # Only needed for live MIDI keyboard input
 ]
 
 [build-system]
