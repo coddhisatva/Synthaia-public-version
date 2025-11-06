@@ -2,7 +2,7 @@
 
 **Synthaia** is an AI-powered music creation toolkit that generates complete songs from a simple text prompt. It combines Large Language Models (LLMs) with MIDI generation to create lyrics, melodies, harmonies, drums, and vocal lines—all from a single theme.
 
-Live Site: (todo)
+Live Site: https://synthaia.vercel.app/
 __________________________________________________________
 ![Synthaia Interface](screenshots/Synthaia%20Cover%201.png)
 __________________________________________________________
